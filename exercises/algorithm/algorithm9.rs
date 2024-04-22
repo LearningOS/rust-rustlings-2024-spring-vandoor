@@ -2,14 +2,13 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
 
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default+Ord,
 {
     count: usize,
     items: Vec<T>,
@@ -18,7 +17,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default+Ord,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -37,7 +36,15 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+      self.count += 1;
+      let mut idx = self.count;     
+      self.items.push(value);
+      while idx > 1 &&  (self.comparator)(&self.items[idx], &self.items[self.parent_idx(idx)]){
+        let pa = self.parent_idx(idx);
+        self.items.swap(idx, pa);
+        idx = pa;
+      }
+
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +64,13 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+      let rid = self.right_child_idx(idx);
+      if rid <= self.count && (self.comparator)(&self.items[rid], &self.items[self.left_child_idx(idx)]){
+        rid
+      }else{
+        self.left_child_idx(idx)
+      }
+      
     }
 }
 
@@ -79,13 +91,28 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default+Ord,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+      if self.count == 0{
+        None
+      }
+		  else{
+        self.items.swap(1, self.count);
+        self.count -= 1;
+        let ret = self.items.pop().unwrap();
+        let mut idx=1;
+        while self.children_present(idx) {
+          let cid = self.smallest_child_idx(idx);
+          if((self.comparator)(&self.items[cid],&self.items[idx])) {self.items.swap(cid, idx)}
+          else {break}
+          idx = cid;
+        }
+        Some(ret)
+      } 
     }
 }
 
@@ -140,15 +167,21 @@ mod tests {
     #[test]
     fn test_max_heap() {
         let mut heap = MaxHeap::new();
+        println!("!!!!");
         heap.add(4);
         heap.add(2);
         heap.add(9);
         heap.add(11);
+        println!("hh");
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(11));
+        println!("aa");
         assert_eq!(heap.next(), Some(9));
+        println!("bb");
         assert_eq!(heap.next(), Some(4));
+        println!("cc");
         heap.add(1);
         assert_eq!(heap.next(), Some(2));
+        println!("dd");
     }
 }

@@ -2,7 +2,6 @@
 	double linked list reverse
 	This problem requires you to reverse a doubly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -59,6 +58,20 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
+    // pub fn add_prev(&mut self, obj: T){
+    //   let mut node = Box::new(Node::new(obj));
+    //   node.prev = None;
+    //   node.next = self.start;
+    //   let node_ptr = Some( unsafe{ NonNull::new_unchecked(Box::into_raw(node)) } );
+    //   match self.start{
+    //     None=>self.end = node_ptr,
+    //     Some(start_ptr)=>unsafe{(*start_ptr.as_ptr()).prev = node_ptr}
+    //   }
+    //   self.start = node_ptr;
+    //   self.length += 1;
+
+    // }
+
     pub fn get(&mut self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
@@ -73,7 +86,40 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn reverse(&mut self){
-		// TODO
+    let mut ed_node: &Option<NonNull<Node<T>>> = &self.end;
+    let mut st_node: &Option<NonNull<Node<T>>> = &self.start;
+    let mut rem = self.length;
+    while rem>=2{
+      if let Some(node_ptr1) = ed_node {
+        if let Some(node_ptr2) = st_node {
+          // let va = unsafe{ (*node_ptr1.as_ptr()).val};
+          // let vb = unsafe{ (*node_ptr2.as_ptr()).val};
+          unsafe{
+            std::mem::swap(&mut (*node_ptr1.as_ptr()).val,  &mut (*node_ptr2.as_ptr()).val );
+          }
+          rem-=2;
+          ed_node = unsafe{ &(*node_ptr1.as_ptr()).prev};
+          st_node = unsafe{ &(*node_ptr2.as_ptr()).next};
+        }
+        else{panic!("!st");}
+      }
+      else{panic!("!ed");}
+      println!("rem={rem}");
+
+
+    }
+    // let mut ret = Self::new();
+    // while let Some(node_ptr) = ed_node{
+    //   let v=unsafe{&(*node_ptr.as_ptr()).val};
+    //   ret.add(v.clone());
+    //   ed_node = unsafe{&(*node_ptr.as_ptr()).prev};
+    // }
+    // self=Self::new();
+
+
+    
+
+		// while let Some(node_ptr) = 
 	}
 }
 

@@ -2,10 +2,10 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
+use std::cmp::Ordering;
 use std::vec::*;
 
 #[derive(Debug)]
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Clone+PartialOrd> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:PartialOrd+Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,15 +69,47 @@ impl<T> LinkedList<T> {
             },
         }
     }
+
+
+
+
+
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
+    let mut ret = Self ::default();
+    ret.length = list_a.length+list_b.length;
+    let mut node_a: &Option<NonNull<Node<T>>> = &list_a.start;
+    let mut node_b: &Option<NonNull<Node<T>>> = &list_b.start;
+
+    loop
+    {
+      if let Some(next_ptr_a) = node_a{
+        if let Some(next_ptr_b) = node_b{
+          let va = unsafe{ &(*next_ptr_a.as_ptr()).val};
+          let vb = unsafe{ &(*next_ptr_b.as_ptr()).val};
+          if va < vb{
+            ret.add(va.clone());
+            node_a = unsafe{ &(*next_ptr_a.as_ptr()).next};
+          }else{
+            ret.add(vb.clone());
+            node_b = unsafe{ &(*next_ptr_b.as_ptr()).next};
+          }
+        }else {break}
+      }else {break}
+    }
+
+    while let Some(next_ptr_a) = node_a {
+      let va = unsafe {&(*next_ptr_a.as_ptr()).val};
+      ret.add(va.clone());
+      node_a = unsafe {&(*next_ptr_a.as_ptr()).next};
+    }
+    while let Some(next_ptr_b) = node_b {
+      let vb = unsafe {&(*next_ptr_b.as_ptr()).val};
+      ret.add(vb.clone());
+      node_b = unsafe {&(*next_ptr_b.as_ptr()).next};
+    }
+    ret
+  }
 }
 
 impl<T> Display for LinkedList<T>
