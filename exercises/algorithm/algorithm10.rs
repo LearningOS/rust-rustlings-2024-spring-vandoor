@@ -39,7 +39,7 @@ impl Graph for UndirectedGraph {
           for (st, val) in &mut *v{
             if st==edge.1{return}
           }
-          v.push((edge.1.into(), edge.2));
+          v.push((edge.1.into(), edge.2)); 
         }
       );
 
